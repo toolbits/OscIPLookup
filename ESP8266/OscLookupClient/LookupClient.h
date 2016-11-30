@@ -6,63 +6,64 @@ class LookupClient {
   private:
     WiFiUDP _udp;
     String _name;
-    int _time;
+    unsigned long _time;
 
   public:
     explicit LookupClient(String const& name) {
       _name = name;
-      _time = -1;
+      _time = 0;
       return;
     }
+
     void update(void) {
+      String ip;
       OSCMessage msg;
-      int time;
+      unsigned long time;
 
       time = millis();
       if (time >= _time) {
-        _time = time + 10000;
-        if (WiFi.status() == WL_NO_SSID_AVAIL || WiFi.status() == WL_CONNECTION_LOST || WiFi.status() == WL_DISCONNECTED) {
-          _udp.stop();
-          wifiStart();
-          _udp.begin(5556);
+        if (WiFi.status() == WL_CONNECTED) {
+          if (!_udp) {
+            if (!_udp.begin(5556)) {
+              _udp.stop();
+            }
+          }
+          if (_udp) {
+            ip = toString(WiFi.localIP());
+            msg.empty();
+            msg.setAddress("/lookup");
+            msg.add(_name.c_str());
+            msg.add(ip.c_str());
+            _udp.beginPacket(IPAddress(255, 255, 255, 255), 5555);
+            msg.send(_udp);
+            _udp.endPacket();
+            Serial.println("[LookupClient] " + _name + " : " + ip);
+            _time = time + 10000 + (int(micros() % 11) - 5) * 200;
+          }
+          else {
+            _time = time + 1000;
+          }
         }
-        msg.setAddress("/lookup");
-        msg.add(_name.c_str());
-        msg.add(WiFi.localIP());
-        _udp.beginPacket(IPAddress(255, 255, 255, 255), 5555);
-        Serial.println("[LookupClient] " + _name + " : " + WiFi.localIP());
+        else {
+          if (_udp) {
+            _udp.stop();
+          }
+          _time = time + 1000;
+        }
       }
       return;
     }
   private:
-    void wifiStart(void) {
-      int status;
+    String toString(IPAddress const& ip) {
+      int i;
+      String result;
 
-      do {
-        status = WiFi.begin();
-        delay(1000);
-        Serial.print(".");
-      } while (status != WL_CONNECTED);
-      Serial.println("");
-      Serial.println("WiFi connected");
-      printWifiStatus();
-    }
-    void printWifiStatus(void)
-    {
-      // print the SSID of the network you're attached to:
-      Serial.print("SSID: ");
-      Serial.println(WiFi.SSID());
-
-      // print your WiFi shield's IP address:
-      IPAddress ip = WiFi.localIP();
-      Serial.print("IP Address: ");
-      Serial.println(ip);
-
-      // print the received signal strength:
-      long rssi = WiFi.RSSI();
-      Serial.print("signal strength (RSSI):");
-      Serial.print(rssi);
-      Serial.println(" dBm");
+      result += ip[0];
+      for (i = 1; i < 4; ++i) {
+        result += ".";
+        result += ip[i];
+      }
+      return result;
     }
   private:
     LookupClient(LookupClient const&);
