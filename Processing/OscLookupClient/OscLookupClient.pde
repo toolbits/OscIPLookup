@@ -8,10 +8,10 @@ OscP5 oscTCP;
 OscP5 oscUDP;
 
 void setup() {
-  lookup = new LookupClient("disp1");
-// for TCP
+  lookup = new LookupClient("macbookpro");
+  // for TCP
   oscTCP = new OscP5(this, 7600, OscP5.TCP);
-// for UDP
+  // for UDP
   oscUDP = new OscP5(this, 8600);
   return;
 }
@@ -23,10 +23,6 @@ void draw() {
 }
 
 synchronized void oscEvent(OscMessage msg) {
-  print("### received an osc message.");
-  print(" addrpattern: "+msg.addrPattern());
-  println(" typetag: "+msg.typetag());
-
   if (msg.checkAddrPattern("/my_test")) {
     if (msg.checkTypetag("s")) {
       println(msg.get(0).stringValue());

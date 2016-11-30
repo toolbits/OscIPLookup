@@ -13,7 +13,7 @@ class LookupClient {
     enableBroadcast();
     _addr = new NetAddress("255.255.255.255", 5555);
     _name = name;
-    _time = -1;
+    _time = 0;
     return;
   }
 
@@ -21,14 +21,14 @@ class LookupClient {
     OscMessage msg;
     int time;
 
-    time = second();
+    time = millis();
     if (time >= _time) {
-      _time = time + 10;
       msg = new OscMessage("/lookup");
       msg.add(_name);
       msg.add(_oscP5.ip());
       _oscP5.send(msg, _addr);
       println("[LookupClient] " + _name + " : " + _oscP5.ip());
+      _time = time + 15000 + (millis() % 11 - 5) * 500;
     }
     return;
   }

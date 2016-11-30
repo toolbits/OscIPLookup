@@ -3,7 +3,7 @@
 #include <OSCBundle.h>
 #include "LookupClient.h"
 
-#define LOOKUP_NAME   ("disp1")
+#define LOOKUP_NAME   ("arduino")
 #define WIFI_SSID     ("!!! your wifi ssid !!!")
 #define WIFI_PASS     ("!!! your wifi pass !!!")
 #define OSC_PORT      (8600)

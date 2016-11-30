@@ -38,7 +38,7 @@ class LookupClient {
             msg.send(_udp);
             _udp.endPacket();
             Serial.println("[LookupClient] " + _name + " : " + ip);
-            _time = time + 10000 + (int(micros() % 11) - 5) * 200;
+            _time = time + 15000 + (int(micros() % 11) - 5) * 500;
           }
           else {
             _time = time + 1000;

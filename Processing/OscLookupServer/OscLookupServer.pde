@@ -9,7 +9,7 @@ OscP5 oscUDP;
 
 void setup() {
   lookup = new LookupServer();
-// for UDP
+  // for UDP
   oscUDP = new OscP5(this, 8601);
   return;
 }
@@ -26,8 +26,8 @@ void mousePressed()
   msg.add("test");
 
   // send an OSC message via TCP
-  if (lookup.hasUpdate("disp1")) {
-    oscTCP = new OscP5(this, lookup.get("disp1"), 7600, OscP5.TCP);
+  if (lookup.hasUpdate("macbookpro")) {
+    oscTCP = new OscP5(this, lookup.get("macbookpro"), 7600, OscP5.TCP);
   }
   if (oscTCP != null) {
     if (oscTCP.tcpClient().socket() == null) {
@@ -37,8 +37,8 @@ void mousePressed()
   }
 
   // send an OSC message via UDP
-  if (!lookup.get("disp1").isEmpty()) {
-    oscUDP.send(msg, new NetAddress(lookup.get("disp1"), 8600));
+  if (!lookup.get("arduino").isEmpty()) {
+    oscUDP.send(msg, new NetAddress(lookup.get("arduino"), 8600));
   }
   return;
 }

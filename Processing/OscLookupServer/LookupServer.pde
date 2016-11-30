@@ -17,7 +17,9 @@ class LookupServer implements OscEventListener {
     String result = "";
 
     try {
-      result = _dict.get(name);
+      if (_dict.get(name) != null) {
+        result = _dict.get(name);
+      }
     }
     catch (Exception e) {
     }
@@ -39,23 +41,16 @@ class LookupServer implements OscEventListener {
   public void oscEvent(OscMessage msg) {
     String name;
     String ip;
-    String prev;
 
     if (msg.checkAddrPattern("/lookup")) {
       if (msg.checkTypetag("ss")) {
         name = msg.get(0).stringValue();
         ip = msg.get(1).stringValue();
         if (!name.isEmpty() && !ip.isEmpty()) {
-          prev = "";
-          try {
-            prev = _dict.get(name);
-          }
-          catch (Exception e) {
-          }
-          if (!ip.equals(prev)) {
+          if (!get(name).equals(ip)) {
+            _dict.set(name, ip);
             _update.set(name, 1);
           }
-          _dict.set(name, ip);
           println("[LookupServer] " + name + " : " + ip);
         }
       }
